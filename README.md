@@ -2,12 +2,12 @@
 
 <div align="center">
 
-[![GitHub Stars](https://img.shields.io/github/stars/ashishpatel26/500-AI-Agents-Projects?style=for-the-badge&color=yellow)](https://github.com/ashishpatel26/500-AI-Agents-Projects/stargazers)
-[![GitHub Forks](https://img.shields.io/github/forks/ashishpatel26/500-AI-Agents-Projects?style=for-the-badge&color=blue)](https://github.com/ashishpatel26/500-AI-Agents-Projects/network/members)
-[![Contributors](https://img.shields.io/github/contributors/ashishpatel26/500-AI-Agents-Projects?style=for-the-badge&color=green)](https://github.com/ashishpatel26/500-AI-Agents-Projects/graphs/contributors)
+[![GitHub Stars](https://img.shields.io/github/stars/ld7942/500-AI-Agents-Projects?style=for-the-badge&color=yellow)](https://github.com/ld7942/500-AI-Agents-Projects/stargazers)
+[![GitHub Forks](https://img.shields.io/github/forks/ld7942/500-AI-Agents-Projects?style=for-the-badge&color=blue)](https://github.com/ld7942/500-AI-Agents-Projects/network/members)
+[![Contributors](https://img.shields.io/github/contributors/ld7942/500-AI-Agents-Projects?style=for-the-badge&color=green)](https://github.com/ld7942/500-AI-Agents-Projects/graphs/contributors)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=for-the-badge)](CONTRIBUTION.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-red?style=for-the-badge)](LICENSE)
-[![Last Commit](https://img.shields.io/github/last-commit/ashishpatel26/500-AI-Agents-Projects?style=for-the-badge)](https://github.com/ashishpatel26/500-AI-Agents-Projects/commits/main)
+[![Last Commit](https://img.shields.io/github/last-commit/ld7942/500-AI-Agents-Projects?style=for-the-badge)](https://github.com/ld7942/500-AI-Agents-Projects/commits/main)
 
 **The most comprehensive collection of AI agent projects, use cases, and working implementations.**
 
@@ -37,7 +37,7 @@ Pick a framework and run an agent in under 5 minutes:
 
 ```bash
 # Clone the repo
-git clone https://github.com/ashishpatel26/500-AI-Agents-Projects.git
+git clone https://github.com/ld7942/500-AI-Agents-Projects.git
 cd 500-AI-Agents-Projects
 
 # Run any agent from the agents/ directory
@@ -297,15 +297,15 @@ See [CONTRIBUTION.md](CONTRIBUTION.md) for full requirements (metadata.yaml, req
 <picture>
   <source
     media="(prefers-color-scheme: dark)"
-    srcset="https://api.star-history.com/svg?repos=ashishpatel26/500-AI-Agents-Projects&type=date&legend=top-left"
+    srcset="https://api.star-history.com/svg?repos=ld7942/500-AI-Agents-Projects&type=date&legend=top-left"
   />
   <source
     media="(prefers-color-scheme: light)"
-    srcset="https://api.star-history.com/svg?repos=ashishpatel26/500-AI-Agents-Projects&type=date&legend=top-left"
+    srcset="https://api.star-history.com/svg?repos=ld7942/500-AI-Agents-Projects&type=date&legend=top-left"
   />
   <img
     alt="Star History Chart"
-    src="https://api.star-history.com/svg?repos=ashishpatel26/500-AI-Agents-Projects&type=date&legend=top-left"
+    src="https://api.star-history.com/svg?repos=ld7942/500-AI-Agents-Projects&type=date&legend=top-left"
   />
 </picture>
 
@@ -321,6 +321,6 @@ This repository is licensed under the MIT License. See the [LICENSE](LICENSE) fi
 
 **⭐ Star this repo if you find it useful — it helps others discover it!**
 
-[Report Issue](https://github.com/ashishpatel26/500-AI-Agents-Projects/issues) • [Request Agent](https://github.com/ashishpatel26/500-AI-Agents-Projects/issues/new?template=feature_request.md) • [Contribute](CONTRIBUTION.md)
+[Report Issue](https://github.com/ld7942/500-AI-Agents-Projects/issues) • [Request Agent](https://github.com/ld7942/500-AI-Agents-Projects/issues/new?template=feature_request.md) • [Contribute](CONTRIBUTION.md)
 
 </div>
