@@ -53,9 +53,13 @@ def _parse_search_string(raw_str: str) -> list[dict]:
 
 
 def search_web(state: ResearchState) -> ResearchState:
-    tool = DuckDuckGoSearchResults()
+    tool = DuckDuckGoSearchResults(locale="zh")
+    try:
+        raw_results = tool.invoke(state["query"])
+    except Exception as e:
+        print(f"搜索时出错: {e}")
+        return {"search_results": []}
     
-    raw_results = tool.invoke(state["query"])
     if isinstance(raw_results, dict):
         results = raw_results.get("results", [])
     elif isinstance(raw_results, list):
@@ -77,29 +81,25 @@ def synthesize_report(state: ResearchState) -> ResearchState:
         temperature=0,
         timeout=300
     )
-    print("start parse message")
+
     try:
         results_text = "\n\n".join(
             f"Source: {r.get('url', 'N/A')}\nTitle: {r.get('title', 'N/A')}\nContent: {r.get('content', '')[:500]}"
             for r in state["search_results"]
         )
         messages = [
-            SystemMessage(content="You are a research analyst. Synthesize the search results into a clear, structured report with: Summary, Key Findings (bullet points), and Sources."),
-            HumanMessage(content=f"Research query: {state['query']}\n\nSearch results:\n{results_text}"),
+            SystemMessage(content="您是一位研究分析师。请将搜索结果综合成一份清晰、结构化的报告，包含：摘要、关键发现（要点）和来源。"),
+            HumanMessage(content=f"研究查询: {state['query']}\n\n搜索结果:\n{results_text}"),
         ]
     except Exception as e:
-        print(f"Error in parse message: {e}")
+        print(f"解析消息时出错: {e}")
         return {"report": "", "messages": []}
-    finally:
-        print("end parse message")
 
     try:
         response = llm.invoke(messages)
     except Exception as e:
-        print(f"Error in synthesize_report: {e}")
+        print(f"综合报告时出错: {e}")
         return {"report": "", "messages": []}
-    finally:
-        print("end synthesize_report")
         
     return {"report": response.content, "messages": [response]}
 
@@ -116,15 +116,15 @@ def build_graph() -> StateGraph:
 
 async def main():
     parser = argparse.ArgumentParser(description="Web Research Agent")
-    parser.add_argument("--query", default="latest advances in AI agents 2026", help="Research query")
+    parser.add_argument("--query", default="2026年前言的AI Agent 项目", help="Research query")
     args = parser.parse_args()
-    print(f"\n🔍 Researching: {args.query}\n")
+    print(f"\n🔍 研究: {args.query}\n")
     
     agent = build_graph()
     result = agent.invoke({"query": args.query, "messages": [], "search_results": [], "report": ""})
 
     print("=" * 60)
-    print("📄 RESEARCH REPORT")
+    print("📄 研究报告")
     print("=" * 60)
     print(result["report"])
 
