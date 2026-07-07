@@ -1,4 +1,4 @@
-# 500+ AI Agent 项目与用例
+# 500+ AI Agent 项目与用例 （中文本地版本）
 
 <div align="center">
 
