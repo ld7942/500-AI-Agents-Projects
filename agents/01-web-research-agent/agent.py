@@ -1,12 +1,12 @@
 """
-Web Research Agent using LangGraph + Tavily Search.
+Web Research Agent using LangGraph + DuckDuckGo Search.
 
 Searches the web for a given topic, synthesizes findings, and returns
 a structured research report.
 
 Usage:
     python agent.py
-    python agent.py --query "latest advances in quantum computing"
+    python agent.py --query "最新量子计算进展"
 """
 
 import argparse
