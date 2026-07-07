@@ -47,7 +47,6 @@ def review_code(code: str, language: str = "python") -> str:
 
 def main():
     parser = argparse.ArgumentParser(description="代码审查智能体")
-    # group = parser.add_mutually_exclusive_group(required=True)
     parser.add_argument("--file", default="agents/01-web-research-agent/agent.py", help="要审查的文件路径（默认 Python 代码）")
     parser.add_argument("--code", default="", help="要审查的代码片段")
     parser.add_argument("--language", default="python", help="编程语言（默认 Python）")
