@@ -6,6 +6,6 @@ framework: langchain
 tags: [code-review, software-development, security, quality]
 industry: software-development
 difficulty: beginner
-llm: gpt-4o
+llm: gemma4 (local)
 entrypoint: agent.py
 requirements: requirements.txt
