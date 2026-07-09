@@ -17,10 +17,11 @@ from urllib.parse import quote
 
 from dotenv import load_dotenv
 from langchain_community.utilities import SQLDatabase
+from langchain_community.agent_toolkits import SQLDatabaseToolkit
+from langchain_community.agent_toolkits import create_sql_agent
+from langchain_classic.agents.agent_types import AgentType
+
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_sql_agent
-from langchain.agents.agent_toolkits import SQLDatabaseToolkit
-from langchain.agents.agent_types import AgentType
 
 load_dotenv()
 
@@ -83,7 +84,13 @@ def sqlite_uri(db_path: str, read_only: bool = True) -> str:
 
 def build_agent(db_path: str, read_only: bool = True):
     db = SQLDatabase.from_uri(sqlite_uri(db_path, read_only=read_only))
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatOpenAI(
+        model="gemma4:e4b",
+        base_url="http://localhost:11434/v1",
+        api_key="langchain_learn_arthur",
+        temperature=0,
+        timeout=300
+    )
     toolkit = SQLDatabaseToolkit(db=db, llm=llm)
     agent = create_sql_agent(
         llm=llm,
@@ -95,27 +102,27 @@ def build_agent(db_path: str, read_only: bool = True):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="SQL Query Agent")
-    parser.add_argument("--db", default="demo.sqlite", help="SQLite database path")
-    parser.add_argument("--question", help="Natural language question (omit for interactive)")
-    parser.add_argument("--allow-write", action="store_true", help="Open the SQLite database read-write instead of read-only")
+    parser = argparse.ArgumentParser(description="SQL 查询代理使用 LangChain 实现")
+    parser.add_argument("--db", default="demo.sqlite", help="SQLite 数据库路径")
+    parser.add_argument("--question", help="自然语言问题（省略则交互式运行）")
+    parser.add_argument("--allow-write", action="store_true", help="读写模式打开 SQLite 数据库")
     args = parser.parse_args()
 
     if args.db == "demo.sqlite" and not os.path.exists("demo.sqlite"):
-        print("🏗️  Creating demo e-commerce database...")
+        print("🏗️  创建演示数据库...")
         create_demo_database("demo.sqlite")
 
     agent, db = build_agent(args.db, read_only=not args.allow_write)
-    print(f"\n📊 Connected to: {args.db}")
-    print(f"🔒 Mode: {'read-write' if args.allow_write else 'read-only'}")
-    print(f"📋 Tables: {', '.join(db.get_table_names())}\n")
+    print(f"\n📊 已连接到: {args.db}")
+    print(f"🔒 模式: {'read-write' if args.allow_write else 'read-only'}")
+    print(f"📋 表: {', '.join(db.get_usable_table_names())}\n")
 
     if args.question:
-        print(f"❓ Question: {args.question}")
+        print(f"❓ 问题: {args.question}")
         result = agent.invoke({"input": args.question})
-        print(f"\n✅ Answer: {result['output']}")
+        print(f"\n✅ 答案: {result['output']}")
     else:
-        print("💬 SQL Agent ready. Ask questions in natural language. Type 'quit' to exit.\n")
+        print("💬 SQL 代理已就绪。请使用自然语言提问。输入 'quit' 退出。\n")
         while True:
             question = input("You: ").strip()
             if question.lower() in ("quit", "exit", "q"):
