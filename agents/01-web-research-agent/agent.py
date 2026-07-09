@@ -24,7 +24,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from langgraph.graph import END, StateGraph
 from langgraph.graph.message import add_messages
-from langchain_community.tools import DuckDuckGoSearchResults
+from ddgs import DDGS
 import asyncio
 
 load_dotenv()
@@ -53,9 +53,9 @@ def _parse_search_string(raw_str: str) -> list[dict]:
 
 
 def search_web(state: ResearchState) -> ResearchState:
-    tool = DuckDuckGoSearchResults(locale="zh")
     try:
-        raw_results = tool.invoke(state["query"])
+        with DDGS() as ddgs:
+            raw_results = ddgs.text(state["query"])
     except Exception as e:
         print(f"搜索时出错: {e}")
         return {"search_results": []}
