@@ -23,6 +23,11 @@ from langchain_classic.agents.agent_types import AgentType
 
 from langchain_openai import ChatOpenAI
 
+import sys
+
+if sys.platform == 'win32':
+    sys.stdout.reconfigure(encoding='utf-8')
+
 load_dotenv()
 
 

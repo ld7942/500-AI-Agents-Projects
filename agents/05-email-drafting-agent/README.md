@@ -1,32 +1,43 @@
 # Email Drafting Agent
 
-A CrewAI two-agent system that drafts professional emails. An analyst agent extracts requirements, then a writer agent produces the final email.
+一个使用 CrewAI 的双 Agent 系统，用于起草专业邮件。分析员 Agent 提取需求，然后作者 Agent 生成最终邮件。
 
-**Framework**: CrewAI  
-**LLM**: GPT-4o-mini  
+**框架**: CrewAI  
+**LLM**: Gemma 4（本地运行）
 
-## Setup
+## 环境设置
 
 ```bash
 pip install -r requirements.txt
-cp .env.example .env
 ```
 
-## Run
+**本地 LLM 设置**:
+- 确保 Ollama 服务运行中：`ollama serve`
+- 拉取模型：`ollama pull gemma4`
+- 设置环境变量：`OLLAMA_BASE_URL=http://localhost:11434`
+
+## 运行
 
 ```bash
-# Default example
+# 默认示例
 python agent.py
 
-# Custom email
+# 自定义邮件
 python agent.py \
-  --context "Apologize for the delayed delivery of the software project" \
+  --context "为软件项目延迟交付道歉" \
   --tone "apologetic but confident" \
-  --recipient "the client project manager"
+  --recipient "客户项目经理"
 ```
 
-## Architecture
+## 架构
 
 ```
-Context → [Analyst Agent] → Email Brief → [Writer Agent] → Final Email
+上下文 → [分析员 Agent] → 邮件摘要 → [作者 Agent] → 最终邮件
 ```
+
+## 功能特点
+
+- ✅ 双 Agent 协作：分析员理解需求，作者撰写邮件
+- ✅ 支持自定义上下文、语气和接收人
+- ✅ 自动提取关键点和主题行建议
+- ✅ 输出专业格式的完整邮件
