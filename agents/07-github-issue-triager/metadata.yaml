@@ -1,11 +1,11 @@
 title: github-issue-triager
-description: Automatically triages GitHub issues with severity, category, and routing recommendations
+description: 自动分类 GitHub 问题，分配严重性、类别、标签和路由建议
 author: ashishpatel26
 language: python
 framework: langchain
 tags: [github, devops, triage, issue-management, automation]
 industry: software-development
 difficulty: intermediate
-llm: gpt-4o-mini
+llm: gemma4:e4b (Ollama)
 entrypoint: agent.py
 requirements: requirements.txt

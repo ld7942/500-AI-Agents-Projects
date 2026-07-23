@@ -1,0 +1,78 @@
+{
+  "url": "https://api.github.com/repos/koala73/worldmonitor/issues/5463",
+  "repository_url": "https://api.github.com/repos/koala73/worldmonitor",
+  "labels_url": "https://api.github.com/repos/koala73/worldmonitor/issues/5463/labels{/name}",
+  "comments_url": "https://api.github.com/repos/koala73/worldmonitor/issues/5463/comments",
+  "events_url": "https://api.github.com/repos/koala73/worldmonitor/issues/5463/events",
+  "html_url": "https://github.com/koala73/worldmonitor/issues/5463",
+  "id": 4952371134,
+  "node_id": "I_kwDOQ2MNCM8AAAABJy8vvg",
+  "number": 5463,
+  "title": "OpenAPI specs: document billing-verification 503 + `code` on 403 for gated ops (post-#5447)",
+  "user": {
+    "login": "koala73",
+    "id": 996596,
+    "node_id": "MDQ6VXNlcjk5NjU5Ng==",
+    "avatar_url": "https://avatars.githubusercontent.com/u/996596?v=4",
+    "gravatar_id": "",
+    "url": "https://api.github.com/users/koala73",
+    "html_url": "https://github.com/koala73",
+    "followers_url": "https://api.github.com/users/koala73/followers",
+    "following_url": "https://api.github.com/users/koala73/following{/other_user}",
+    "gists_url": "https://api.github.com/users/koala73/gists{/gist_id}",
+    "starred_url": "https://api.github.com/users/koala73/starred{/owner}{/repo}",
+    "subscriptions_url": "https://api.github.com/users/koala73/subscriptions",
+    "organizations_url": "https://api.github.com/users/koala73/orgs",
+    "repos_url": "https://api.github.com/users/koala73/repos",
+    "events_url": "https://api.github.com/users/koala73/events{/privacy}",
+    "received_events_url": "https://api.github.com/users/koala73/received_events",
+    "type": "User",
+    "user_view_type": "public",
+    "site_admin": false
+  },
+  "labels": [
+
+  ],
+  "state": "open",
+  "locked": false,
+  "assignees": [
+
+  ],
+  "milestone": null,
+  "comments": 0,
+  "created_at": "2026-07-22T19:18:38Z",
+  "updated_at": "2026-07-22T19:18:38Z",
+  "closed_at": null,
+  "assignee": null,
+  "author_association": "OWNER",
+  "active_lock_reason": null,
+  "sub_issues_summary": {
+    "total": 0,
+    "completed": 0,
+    "percent_completed": 0
+  },
+  "issue_dependencies_summary": {
+    "blocked_by": 0,
+    "total_blocked_by": 0,
+    "blocking": 0,
+    "total_blocking": 0
+  },
+  "body": "PR #5447 (+ review fixes) added a billing-verification wire contract on PRO/API-gated REST operations: retryable **503** with `Retry-After` (1-60s) + `X-Billing-Verification` + `{error, code}` body (`renewal_verification_pending` / `renewal_verification_failed` / `entitlement_verification_unavailable`), and a **403** variant whose body now carries `code: subscription_lapsed`.\n\nThe prose docs are updated (`docs/usage-errors.mdx`, `docs/mcp-error-catalog.mdx`), but the generated OpenAPI specs are not:\n\n- `docs/api/*.openapi.{json,yaml}` gated operations enumerate `200/400/401/403/429/default` only — no 503 response object.\n- The `ForbiddenError` schema has no `code` property (`currentTier`, `error`, `planKey`, `requiredTier` only).\n\nPer the established pattern (sebuf `protoc-gen-openapiv3` has no option for this), the fix is a **post-generation injector** wired into `make generate` (see `scripts/openapi-inject-security.mjs` siblings + `scripts/lib/openapi-codegen.mjs`):\n\n1. Inject a `503` response (schema with `error`, `code` enum, `Retry-After` header) on every op behind `ENDPOINT_ENTITLEMENTS` / `PREMIUM_RPC_PATHS` / wm_-key auth (reuse the fail-closed source parsers in `openapi-codegen.mjs`).\n2. Add `code` to the `ForbiddenError` schema (optional string enum incl. `subscription_lapsed`).\n3. Byte-faithful JSON serializer + surgical YAML insertion; add the injector to `make generate` order and its own `--check`; keep it order-independent vs the security/examples/jmespath injectors.\n4. Guard test mirroring `mcp-api-parity` so the enum stays in sync with `server/_shared/usage.ts` / `entitlement-check.ts`.\n\nDeliberately split out of #5447: the regenerated diff spans all 34 service specs and would have drowned the payments PR.",
+  "closed_by": null,
+  "reactions": {
+    "url": "https://api.github.com/repos/koala73/worldmonitor/issues/5463/reactions",
+    "total_count": 0,
+    "+1": 0,
+    "-1": 0,
+    "laugh": 0,
+    "hooray": 0,
+    "confused": 0,
+    "heart": 0,
+    "rocket": 0,
+    "eyes": 0
+  },
+  "timeline_url": "https://api.github.com/repos/koala73/worldmonitor/issues/5463/timeline",
+  "performed_via_github_app": null,
+  "state_reason": null,
+  "pinned_comment": null
+}
