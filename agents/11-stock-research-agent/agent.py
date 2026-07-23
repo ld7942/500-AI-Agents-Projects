@@ -1,10 +1,9 @@
 """
-Stock Research Agent using Agno + Yahoo Finance.
+股票研究智能体 使用 Agno + Yahoo Finance.
 
-Provides comprehensive stock analysis: price data, financials,
-analyst ratings, and AI-powered investment summary.
+提供全面的股票分析：价格数据、财务指标、分析师评级和AI驱动的投资总结。
 
-Usage:
+用法:
     python agent.py --ticker AAPL
     python agent.py --ticker NVDA
 """
@@ -28,7 +27,7 @@ from langchain_openai import ChatOpenAI
 
 def get_stock_data(ticker: str) -> dict:
     if not HAS_YFINANCE:
-        return {"ticker": ticker, "error": "yfinance not installed", "mock": True}
+        return {"ticker": ticker, "error": "yfinance 未安装", "mock": True}
 
     stock = yf.Ticker(ticker)
     info = stock.info
@@ -55,13 +54,19 @@ def get_stock_data(ticker: str) -> dict:
 
 
 def analyze_stock(data: dict) -> str:
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatOpenAI(
+        model="gemma4:e4b",
+        base_url="http://localhost:11434/v1",
+        api_key="langchain_learn_arthur",
+        temperature=0,
+        timeout=300
+    )
 
     stock_info = "\n".join(f"{k}: {v}" for k, v in data.items() if k != "description")
 
     messages = [
-        SystemMessage(content="You are a financial analyst. Provide a concise stock analysis covering: Investment Thesis (2-3 sentences), Key Strengths (3 bullets), Key Risks (3 bullets), Valuation Assessment, and a Verdict (Buy/Hold/Sell with brief reasoning). Keep it under 300 words."),
-        HumanMessage(content=f"Analyze this stock:\n{stock_info}\n\nCompany description: {data.get('description', 'N/A')}"),
+        SystemMessage(content="你是一个专业的股票分析师。请提供一个简洁的股票分析,包括:投资假设(2-3句),关键优势(3个点),关键风险(3个点),估值评估,和一个判断(购买/持有/卖出，带简单的理由). 保持在300字以下."),
+        HumanMessage(content=f"分析股票:\n{stock_info}\n\n公司描述: {data.get('description', 'N/A')}"),
     ]
 
     response = llm.invoke(messages)
@@ -81,25 +86,25 @@ def format_number(n) -> str:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Stock Research Agent")
-    parser.add_argument("--ticker", required=True, help="Stock ticker symbol (e.g., AAPL)")
+    parser = argparse.ArgumentParser(description="股票研究智能体")
+    parser.add_argument("--ticker", required=True, help="股票代码（例如：AAPL）")
     args = parser.parse_args()
 
-    print(f"\n📈 Researching {args.ticker}...\n")
+    print(f"\n📈 研究 {args.ticker}...\n")
 
     data = get_stock_data(args.ticker)
 
     print("=" * 60)
     print(f"📊 {data.get('name', args.ticker)} ({args.ticker})")
     print("=" * 60)
-    print(f"Price: ${data.get('price', 'N/A')}  |  Market Cap: {format_number(data.get('market_cap', 0))}")
-    print(f"Sector: {data.get('sector')}  |  Industry: {data.get('industry')}")
-    print(f"P/E: {data.get('pe_ratio')}  |  Forward P/E: {data.get('forward_pe')}  |  PEG: {data.get('peg_ratio')}")
-    print(f"52W Range: ${data.get('52w_low')} - ${data.get('52w_high')}")
+    print(f"价格: ${data.get('price', 'N/A')}  |  市场市值: {format_number(data.get('market_cap', 0))}")
+    print(f"行业: {data.get('sector')}  |  行业: {data.get('industry')}")
+    print(f"P/E: {data.get('pe_ratio')}  |  前向P/E率: {data.get('forward_pe')}  |  PEG: {data.get('peg_ratio')}")
+    print(f"52周范围: ${data.get('52w_low')} - ${data.get('52w_high')}")
     analyst_rating = data.get("analyst_rating") or "N/A"
-    print(f"Analyst: {str(analyst_rating).upper()}  |  Target: ${data.get('target_price', 'N/A')}")
+    print(f"分析师评级: {str(analyst_rating).upper()}  |  目标价格: ${data.get('target_price', 'N/A')}")
 
-    print("\n🤖 AI Analysis:")
+    print("\n🤖 AI 分析结果:")
     print("-" * 40)
     analysis = analyze_stock(data)
     print(analysis)

@@ -21,8 +21,6 @@ from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
-sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
-
 load_dotenv()
 
 NOTES_PROMPT = """你是一个专业的会议纪要记录员。将会议记录转换为结构化的会议纪要，格式为 JSON:
