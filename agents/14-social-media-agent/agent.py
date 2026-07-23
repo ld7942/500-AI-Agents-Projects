@@ -1,12 +1,11 @@
 """
-Social Media Content Agent using CrewAI.
+社交媒体内容生成器, 基于CrewAI.
 
-Generates platform-optimized content (Twitter/X, LinkedIn, Instagram)
-from a topic or article URL.
+根据主题或文章URL生成平台优化的内容社交媒体帖子.
 
 Usage:
-    python agent.py --topic "The rise of AI agents in 2025"
-    python agent.py --topic "New product launch: CloudSync Pro v3" --brand "CloudSync"
+    python agent.py --topic "2026 年度产品发布"
+    python agent.py --topic "新品发布会: 2026 年度产品发布" --brand "小米"
 """
 
 import argparse
@@ -20,45 +19,46 @@ load_dotenv()
 
 
 def generate_social_content(topic: str, brand: str, platforms: list[str]) -> str:
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.7)
+    llm="ollama/gemma4:e4b"
 
     strategist = Agent(
-        role="Social Media Strategist",
-        goal="Analyze the topic and define the key message, target audience, and tone for each platform",
-        backstory="Award-winning social media strategist who has grown 50+ brand accounts to 100k+ followers.",
+        role="社交媒体策略师",
+        goal="分析主题并定义每个平台的关键消息、目标受众和语气",
+        backstory="经验丰富的社交媒体策略师，有丰富的社交媒体策略经验，能够根据主题生成符合平台要求的内容帖子。",
         llm=llm,
         verbose=False,
     )
 
     writer = Agent(
-        role="Social Media Copywriter",
-        goal="Write engaging, platform-optimized content that drives engagement",
-        backstory="Viral content creator with expertise in platform-specific formats, hashtags, and hooks.",
+        role="社交媒体文案作者",
+        goal="根据策略生成符合平台要求的社交媒体帖子。",
+        backstory="经验丰富的社交媒体文案作者，有丰富的社交媒体文案创作经验，能够根据策略生成符合平台要求的内容帖子。",
         llm=llm,
         verbose=False,
     )
 
     strategy_task = Task(
-        description=f"""Analyze this topic for social media: "{topic}"
+        description=f"""分析主题并定义每个平台的关键消息、目标受众和语气。
+Topic: "{topic}"
 Brand: {brand or 'Not specified'}
 Platforms: {', '.join(platforms)}
-Define: core message, target audience, emotional hook, 5 relevant hashtags.""",
+""",
         agent=strategist,
-        expected_output="Content strategy: message, audience, hook, and hashtags",
+        expected_output="内容策略: 消息, 目标受众, 情感钩子, #标签",
     )
 
     writing_task = Task(
-        description=f"""Write social media posts for: {', '.join(platforms)}
+        description=f"""为社交平台符合策略生成帖子: {', '.join(platforms)}
 Topic: {topic}. Brand: {brand or 'General'}.
 
-For each platform:
-- Twitter/X: 2 tweet variations (under 280 chars each) + thread opener
-- LinkedIn: Professional post (150-200 words) with storytelling hook
-- Instagram: Caption (100-150 words) + 15 hashtags
+为每个平台符合策略生成帖子:
+- 微博: 2条微博 + 线程开头
+- 小红书: 2条帖子 + 情感钩子
+- 抖音: 2条视频 + 15 #标签
 
-Make them platform-native — Twitter punchy, LinkedIn thoughtful, Instagram visual.""",
+生成符合平台要求的帖子。""",
         agent=writer,
-        expected_output="Platform-optimized posts for all requested platforms",
+        expected_output="符合平台要求的帖子。",
         context=[strategy_task],
     )
 
@@ -73,20 +73,20 @@ Make them platform-native — Twitter punchy, LinkedIn thoughtful, Instagram vis
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Social Media Content Agent")
-    parser.add_argument("--topic", default="How AI is transforming software development in 2025", help="Content topic")
-    parser.add_argument("--brand", default="", help="Brand name (optional)")
-    parser.add_argument("--platforms", default="twitter,linkedin,instagram", help="Comma-separated platforms")
+    parser = argparse.ArgumentParser(description="社交媒体内容生成器")
+    parser.add_argument("--topic", default="2026 年度产品发布", help="主题")
+    parser.add_argument("--brand", default="", help="品牌名称")
+    parser.add_argument("--platforms", default="微博,小红书,抖音", help="平台列表")
     args = parser.parse_args()
 
     platforms = [p.strip() for p in args.platforms.split(",")]
-    print(f"\n📱 Generating content for: {', '.join(platforms)}")
-    print(f"📌 Topic: {args.topic}\n")
+    print(f"\n📱 生成内容为平台: {', '.join(platforms)}")
+    print(f"📌 主题: {args.topic}\n")
 
     content = generate_social_content(args.topic, args.brand, platforms)
 
     print("=" * 60)
-    print("✍️  SOCIAL MEDIA CONTENT")
+    print("✍️  生成内容")
     print("=" * 60)
     print(content)
 
