@@ -1,11 +1,11 @@
 title: news-summarizer-agent
-description: Fetches news on any topic and produces a structured briefing with key themes
+description: 从微博获取热门新闻并生成结构化摘要，包含主要新闻、关键主题和关注要点
 author: ashishpatel26
 language: python
 framework: langchain
-tags: [news, summarization, media, nlp]
+tags: [news, summarization, media, nlp, weibo]
 industry: media
 difficulty: beginner
-llm: gpt-4o-mini
+llm: gemma4:e4b (Ollama)
 entrypoint: agent.py
 requirements: requirements.txt
