@@ -1,10 +1,10 @@
 """
-Meeting Notes Agent.
+会议纪要智能体.
 
-Converts meeting transcript text into structured meeting notes:
-summary, action items, decisions, and follow-ups.
+将会议记录文本转换为结构化的会议纪要:
+摘要、操作项、决策和跟进项。
 
-Usage:
+使用:
     python agent.py --transcript meeting.txt
     python agent.py --text "John: Let's ship v2 next Friday..."
 """
@@ -13,15 +13,19 @@ import argparse
 import json
 import os
 import re
+import sys
+import io
 from datetime import date, datetime
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 
+sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+
 load_dotenv()
 
-NOTES_PROMPT = """You are a professional meeting note-taker. Convert the meeting transcript into structured notes as JSON:
+NOTES_PROMPT = """你是一个专业的会议纪要记录员。将会议记录转换为结构化的会议纪要，格式为 JSON:
 {
   "meeting_title": "inferred title",
   "date": "today or mentioned date",
@@ -37,31 +41,30 @@ NOTES_PROMPT = """You are a professional meeting note-taker. Convert the meeting
   "next_meeting": "scheduled time or TBD",
   "follow_up_questions": ["question needing resolution"]
 }
-Return only valid JSON."""
+返回有效的 JSON 格式."""
 
 SAMPLE_TRANSCRIPT = """
-Sarah: Alright everyone, let's get started. It's Monday the 3rd and we have John, Mike, and Lisa here.
+Sarah: 好了各位，我们开始吧。今天是3号星期一，我们有 John、Mike 和 Lisa 参加。
 
-John: Thanks Sarah. So the main thing I wanted to cover is the Q4 product roadmap.
-We need to decide on the feature freeze date.
+John: 谢谢 Sarah。我主要想讨论的是 Q4 产品路线图。我们需要确定功能冻结日期。
 
-Sarah: I think we should freeze by November 15th. That gives QA three weeks before the holiday release.
+Sarah: 我认为我们应该在11月15日之前冻结。这样 QA 在假日发布前有三周时间。
 
-Mike: That works for me. But we still need to finalize the payment integration. Lisa, where are you on that?
+Mike: 我没问题。但我们还需要完成支付集成。Lisa，你那边的进展如何？
 
-Lisa: I'm about 60% done. I need the API docs from the payment provider. I've emailed them twice but haven't heard back.
+Lisa: 我大概完成了60%。我需要支付提供商的 API 文档。我已经发了两封邮件，但还没收到回复。
 
-John: I'll escalate that today. I'll reach out to our account manager at PaymentCo. That's blocking us.
+John: 我今天就去升级处理。我会联系 PaymentCo 的客户经理。这正在阻碍我们。
 
-Sarah: Okay, so John will handle the PaymentCo escalation by end of today. Lisa continues on payment integration, targeting completion by November 10th.
+Sarah: 好的，那么 John 今天下班前会处理 PaymentCo 的升级事宜。Lisa 继续支付集成工作，目标在11月10日前完成。
 
-Mike: I can help with testing once Lisa has a draft ready. Let's say I start testing November 11th.
+Mike: 等 Lisa 准备好初稿后，我可以帮忙测试。假设我从11月11日开始测试。
 
-Sarah: Great. Also, we decided to cut the social login feature from this release. Too risky to add now.
+Sarah: 很好。另外，我们决定从这个版本中砍掉社交登录功能。现在添加风险太大了。
 
-John: Agreed. We'll put it in Q1 backlog.
+John: 同意。我们会把它放到 Q1 的待办事项中。
 
-Sarah: Any other blockers? No? Okay. Same time next week, November 10th.
+Sarah: 还有其他阻碍吗？没有？好的。下周同一时间，11月10日见。
 """
 
 
@@ -77,10 +80,16 @@ def parse_json_response(text: str) -> dict:
 
 
 def generate_meeting_notes(transcript: str) -> dict:
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatOpenAI(
+        model="gemma4:e4b",
+        base_url="http://localhost:11434/v1",
+        api_key="langchain_learn_arthur",
+        temperature=0,
+        timeout=300
+    )
     messages = [
         SystemMessage(content=NOTES_PROMPT),
-        HumanMessage(content=f"Meeting transcript:\n\n{transcript}"),
+        HumanMessage(content=f"会议记录文本:\n\n{transcript}"),
     ]
     response = llm.invoke(messages)
     return parse_json_response(response.content)
@@ -89,46 +98,46 @@ def generate_meeting_notes(transcript: str) -> dict:
 def format_notes(notes: dict) -> str:
     lines = [
         f"# {notes.get('meeting_title', 'Meeting Notes')}",
-        f"**Date:** {notes.get('date', date.today().isoformat())}  |  **Duration:** {notes.get('duration_estimate', 'N/A')}",
-        f"**Participants:** {', '.join(notes.get('participants', []))}",
+        f"**日期:** {notes.get('date', date.today().isoformat())}  |  **持续时间:** {notes.get('duration_estimate', 'N/A')}",
+        f"**参会人员:** {'、 '.join(notes.get('participants', []))}",
         "",
         "## Summary",
         notes.get("summary", ""),
         "",
-        "## Key Decisions",
+        "## �键决策",
         *[f"- {d}" for d in notes.get("key_decisions", [])],
         "",
-        "## Action Items",
+        "## 操作项",
     ]
     for item in notes.get("action_items", []):
         lines.append(f"- [ ] **{item.get('task', 'Task')}** — Owner: {item.get('owner', 'TBD')} | Due: {item.get('due', 'TBD')}")
 
     if notes.get("blockers"):
-        lines += ["", "## Blockers", *[f"- {b}" for b in notes["blockers"]]]
+        lines += ["", "## 阻碍项", *[f"- {b}" for b in notes["blockers"]]]
 
     if notes.get("next_meeting") and notes["next_meeting"] != "TBD":
-        lines += ["", f"**Next Meeting:** {notes['next_meeting']}"]
+        lines += ["", f"**下次会议:** {notes['next_meeting']}"]
 
     return "\n".join(lines)
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Meeting Notes Agent")
+    parser = argparse.ArgumentParser(description="会议纪要智能体")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("--transcript", help="Path to transcript text file")
-    group.add_argument("--text", help="Transcript text directly")
-    parser.add_argument("--output", default="meeting_notes.md", help="Markdown output path")
+    group.add_argument("--transcript", help="会议记录文本文件路径")
+    group.add_argument("--text", help="会议记录文本直接")
+    parser.add_argument("--output", default="会议纪要.md", help="Markdown 输出路径")
     args = parser.parse_args()
 
     if args.transcript:
         with open(args.transcript) as f:
             transcript = f.read()
-        print(f"\n📝 Processing: {args.transcript}\n")
+        print(f"\n📝 处理: {args.transcript}\n")
     elif args.text:
         transcript = args.text
-        print("\n📝 Processing transcript...\n")
+        print("\n📝 处理会议记录文本...\n")
     else:
-        print("\n📝 Using sample meeting transcript\n")
+        print("\n📝 使用样本会议记录文本\n")
         transcript = SAMPLE_TRANSCRIPT
 
     notes = generate_meeting_notes(transcript)
@@ -142,10 +151,10 @@ def main():
     output_file = args.output
     if os.path.exists(output_file) and args.output == "meeting_notes.md":
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        output_file = f"meeting_notes_{stamp}.md"
-    with open(output_file, "w") as f:
+        output_file = f"会议纪要_{stamp}.md"
+    with open(output_file, "w", encoding="utf-8") as f:
         f.write(formatted)
-    print(f"\n✅ Saved to: {output_file}")
+    print(f"\n✅ 保存到: {output_file}")
 
 
 if __name__ == "__main__":
