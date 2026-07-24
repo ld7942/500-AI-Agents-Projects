@@ -39,37 +39,39 @@ def extract_structure(code: str) -> str:
 
         return "\n".join(structure)
     except Exception:
-        return "Could not parse structure"
+        return "无法解析代码结构"
 
 
-README_PROMPT = """You are a technical documentation expert. Generate a complete, professional README.md for this Python module.
+README_PROMPT = """你是一位技术文档专家。请为这个 Python 模块生成一份完整、专业的 README.md。
 
-Include:
-1. Module title and one-line description
-2. Features list (bullet points)
-3. Installation section
-4. Quick Start with working code example
-5. API Reference (each public function/class with parameters, return type, example)
-6. Configuration (environment variables if any)
-7. Error Handling section
+请包含：
+1. 模块标题和一行描述
+2. 功能列表（项目符号）
+3. 安装部分
+4. 快速入门及可运行的代码示例
+5. API 参考（每个公共函数/类包含参数、返回类型、示例）
+6. 配置（如有环境变量）
+7. 错误处理部分
+8. 贡献指南（如有）
+9. 使用中文编写
 
-Write in clear, developer-friendly markdown. Be specific and concrete."""
+请用清晰、开发者友好的 markdown 格式编写。内容要具体、详实。"""
 
-DOCSTRING_PROMPT = """Add comprehensive Google-style docstrings to every function and class that lacks them.
+DOCSTRING_PROMPT = """添加全面的 Google 风格文档字符串到每个缺少文档字符串的函数和类。
 
-Format:
+格式：
 ```
 def function(param: type) -> return_type:
-    \"\"\"One-line summary.
+    \"\"\"一行描述。
 
     Args:
-        param: Description of parameter.
+        param: 参数描述。
 
     Returns:
-        Description of return value.
+        返回值描述。
 
     Raises:
-        ErrorType: When this error is raised.
+        ErrorType: 当发生此错误时。
 
     Example:
         >>> function(value)
@@ -77,24 +79,36 @@ def function(param: type) -> return_type:
     \"\"\"
 ```
 
-Return the complete updated Python file with docstrings added."""
+Return完整的更新后的 Python 文件，包含添加的文档字符串."""
 
 
 def generate_readme(code: str, filename: str) -> str:
-    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    llm = ChatOpenAI(
+        model="gemma4:e4b",
+        base_url="http://localhost:11434/v1",
+        api_key="langchain_learn_arthur",
+        temperature=0,
+        timeout=300
+    )
     structure = extract_structure(code)
     messages = [
         SystemMessage(content=README_PROMPT),
-        HumanMessage(content=f"File: {filename}\n\nCode structure:\n{structure}\n\nFull code:\n```python\n{code[:3000]}\n```"),
+        HumanMessage(content=f"文件: {filename}\n\n代码结构:\n{structure}\n\n完整代码:\n```python\n{code[:3000]}\n```"),
     ]
     return llm.invoke(messages).content
 
 
 def add_docstrings(code: str, filename: str) -> str:
-    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    llm = ChatOpenAI(
+        model="gemma4:e4b",
+        base_url="http://localhost:11434/v1",
+        api_key="langchain_learn_arthur",
+        temperature=0,
+        timeout=300
+    )
     messages = [
         SystemMessage(content=DOCSTRING_PROMPT),
-        HumanMessage(content=f"Add docstrings to this Python file ({filename}):\n\n```python\n{code}\n```"),
+        HumanMessage(content=f"为文件 {filename} 添加文档字符串:\n\n```python\n{code}\n```"),
     ]
     result = llm.invoke(messages).content
     # Clean markdown fences
@@ -151,15 +165,15 @@ class UserValidator:
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Documentation Writer Agent")
+    parser = argparse.ArgumentParser(description="文档编写器智能体")
     group = parser.add_mutually_exclusive_group()
-    group.add_argument("--file", help="Python file to document")
-    group.add_argument("--code", help="Inline code to document")
-    parser.add_argument("--format", choices=["readme", "docstrings", "both"], default="both", help="Documentation format to generate")
+    group.add_argument("--file", help="要文档化的 Python 文件")
+    group.add_argument("--code", help="要文档的代码片段")
+    parser.add_argument("--format", choices=["readme", "docstrings", "both"], default="both", help="文档化格式")
     args = parser.parse_args()
 
     if args.file:
-        with open(args.file) as f:
+        with open(args.file, "r", encoding="utf-8") as f:
             code = f.read()
         filename = os.path.basename(args.file)
     elif args.code:
@@ -168,25 +182,25 @@ def main():
     else:
         code = SAMPLE_CODE
         filename = "validators.py"
-        print("\n📝 Using sample validators module")
+        print("\n📝 使用示例验证模块")
 
-    print(f"\n✍️  Generating documentation for: {filename}\n")
+    print(f"\n✍️  为 {filename} 生成文档...\n")
 
     if args.format in ("readme", "both"):
-        print("📄 Generating README...")
+        print("📄 生成 README...")
         readme = generate_readme(code, filename)
         readme_file = f"README_{filename.replace('.py', '')}.md"
-        with open(readme_file, "w") as f:
+        with open(readme_file, "w", encoding="utf-8") as f:
             f.write(readme)
-        print(f"✅ README saved to: {readme_file}")
+        print(f"✅ README 已保存到: {readme_file}")
 
     if args.format in ("docstrings", "both"):
-        print("📝 Adding docstrings...")
+        print("📝 添加文档字符串...")
         documented_code = add_docstrings(code, filename)
         output_file = f"documented_{filename}"
-        with open(output_file, "w") as f:
+        with open(output_file, "w", encoding="utf-8") as f:
             f.write(documented_code)
-        print(f"✅ Documented code saved to: {output_file}")
+        print(f"✅ 文档化代码已保存到: {output_file}")
 
 
 if __name__ == "__main__":
