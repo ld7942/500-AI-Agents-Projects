@@ -12,32 +12,31 @@ Run: python agent.py
 from crewai import Agent, Crew, Process, Task
 from langchain_openai import ChatOpenAI
 
-llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.3)
+llm =  "ollama/gemma4:e4b"
 
 # 1. Define the agent
 researcher = Agent(
-    role="AI Researcher",
-    goal="Research and summarize the latest developments in AI agents",
-    backstory="""You are a seasoned AI researcher who stays up-to-date with
-    the latest papers, frameworks, and applications in the AI agent space.
-    You write clear, accurate summaries for technical audiences.""",
+    role="AI 研究员",
+    goal="研究并总结 AI 最新的发展",
+    backstory="""你是一位经验丰富的AI研究员，始终关注AI智能体领域的最新论文、框架和应用。
+    你为技术受众撰写清晰、准确的摘要。""",
     llm=llm,
     verbose=True,
 )
 
 # 2. Define the task
 research_task = Task(
-    description="""Research and write a concise briefing on:
-    "The current state of AI agents in 2025"
+    description="""研究并撰写一份简明的简报，主题为：
+    "2026年AI智能体的现状"
 
-    Cover:
-    - What are AI agents and why they matter
-    - Top 3 frameworks (CrewAI, LangGraph, AutoGen)
-    - 2 real-world use cases making impact
-    - What's coming next
+    涵盖内容：
+    - 什么是AI智能体以及它们为何重要
+    - 三大顶级框架（CrewAI、LangGraph、AutoGen）
+    - 2个产生影响的真实用例
+    - 未来发展趋势
 
-    Keep it under 300 words, technical audience.""",
-    expected_output="A concise technical briefing on AI agents in 2025",
+    控制在300字以内，面向技术受众。""",
+    expected_output="一份关于2026年AI智能体的简明技术简报",
     agent=researcher,
 )
 
@@ -52,6 +51,6 @@ crew = Crew(
 if __name__ == "__main__":
     result = crew.kickoff()
     print("\n" + "=" * 60)
-    print("FINAL RESULT:")
+    print("最终结果:")
     print("=" * 60)
     print(result)

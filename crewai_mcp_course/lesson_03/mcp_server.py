@@ -10,26 +10,27 @@ Run: python mcp_server.py
 
 import json
 from datetime import datetime
+from datetime import timezone
 
 try:
     from fastmcp import FastMCP
     HAS_FASTMCP = True
 except ImportError:
     HAS_FASTMCP = False
-    print("FastMCP not installed. Run: pip install fastmcp")
-    print("Showing example server code only.\n")
+    print("FastMCP未安装. 运行: pip install fastmcp")
+    print("仅显示示例服务器代码.\n")
 
 
 def create_mcp_server():
     if not HAS_FASTMCP:
         return None
 
-    mcp = FastMCP("CrewAI Course Tools")
+    mcp = FastMCP("CrewAI 课程工具")
 
     @mcp.tool()
     def get_datetime() -> str:
         """Get the current date and time in UTC."""
-        return datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S UTC")
+        return datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC")
 
     @mcp.tool()
     def prioritize_tasks(tasks: list[str]) -> str:
@@ -44,7 +45,7 @@ def create_mcp_server():
         """
         prioritized = []
         for i, task in enumerate(tasks):
-            priority = "HIGH" if i < len(tasks) // 3 else "MEDIUM" if i < 2 * len(tasks) // 3 else "LOW"
+            priority = "高" if i < len(tasks) // 3 else "中" if i < 2 * len(tasks) // 3 else "低"
             prioritized.append({"rank": i + 1, "task": task, "priority": priority})
         return json.dumps(prioritized, indent=2)
 
@@ -74,7 +75,7 @@ def create_mcp_server():
             Dictionary with completion percentage and status
         """
         percentage = (tasks_completed / tasks_total * 100) if tasks_total > 0 else 0
-        status = "On Track" if percentage >= 50 else "At Risk" if percentage >= 25 else "Behind"
+        status = "按计划" if percentage >= 50 else "风险中" if percentage >= 25 else "落后"
         return {
             "completed": tasks_completed,
             "total": tasks_total,
@@ -88,8 +89,9 @@ def create_mcp_server():
 if __name__ == "__main__":
     mcp = create_mcp_server()
     if mcp:
-        print("🚀 MCP Server starting on localhost:8000")
-        print("Tools available: get_datetime, prioritize_tasks, format_as_json, calculate_project_metrics")
+        # 启动MCP服务器，监听localhost:8000
+        print("🚀 CrewAI 课程工具服务器启动在 localhost:8000")
+        print("工具可用: get_datetime, prioritize_tasks, format_as_json, calculate_project_metrics")
         mcp.run(transport="streamable-http", host="localhost", port=8000)
     else:
-        print("Install fastmcp to run the server: pip install fastmcp")
+        print("请安装FastMCP库以运行服务器: pip install fastmcp")
