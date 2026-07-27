@@ -33,23 +33,35 @@ class AnalysisState(TypedDict):
 
 
 def identify_competitors(state: AnalysisState) -> AnalysisState:
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatOpenAI(
+        model="gemma4:e4b",
+        base_url="http://localhost:11434/v1",
+        api_key="langchain_learn_arthur",
+        temperature=0,
+        timeout=300
+    )
     response = llm.invoke([
-        SystemMessage(content="You are a market research analyst. List exactly 5 main competitors as a comma-separated list. Nothing else."),
-        HumanMessage(content=f"Company: {state['company']}\nIndustry: {state['industry']}\n\nList 5 main competitors:"),
+        SystemMessage(content="你是一个市场研究分析师。请列出5个主要竞争对手，用逗号分隔。其他内容。"),
+        HumanMessage(content=f"公司: {state['company']}\n行业: {state['industry']}\n\n列出5个竞争对手："),
     ])
     competitors = [c.strip() for c in response.content.split(",")][:5]
     return {"competitors": competitors, "messages": [response]}
 
 
 def analyze_competitor(state: AnalysisState) -> AnalysisState:
-    llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
+    llm = ChatOpenAI(
+        model="gemma4:e4b",
+        base_url="http://localhost:11434/v1",
+        api_key="langchain_learn_arthur",
+        temperature=0,
+        timeout=300
+    )
     analyses = {}
 
     for competitor in state["competitors"]:
         response = llm.invoke([
-            SystemMessage(content="Provide a concise competitive analysis in 100 words covering: main products, strengths (2), weaknesses (2), pricing model, target market."),
-            HumanMessage(content=f"Analyze {competitor} vs {state['company']} in {state['industry']}:"),
+            SystemMessage(content="请提供100字左右的竞争对手分析，覆盖主要产品、优势、劣势、定价模型和目标市场。"),
+            HumanMessage(content=f"分析 {competitor} 对 {state['company']} 的 {state['industry']} 市场分析："),
         ])
         analyses[competitor] = response.content
 
@@ -57,7 +69,13 @@ def analyze_competitor(state: AnalysisState) -> AnalysisState:
 
 
 def generate_report(state: AnalysisState) -> AnalysisState:
-    llm = ChatOpenAI(model="gpt-4o", temperature=0)
+    llm = ChatOpenAI(
+        model="gemma4:e4b",
+        base_url="http://localhost:11434/v1",
+        api_key="langchain_learn_arthur",
+        temperature=0,
+        timeout=300
+    )
 
     analyses_text = "\n\n".join(
         f"**{name}:**\n{analysis}"
@@ -65,13 +83,13 @@ def generate_report(state: AnalysisState) -> AnalysisState:
     )
 
     response = llm.invoke([
-        SystemMessage(content="""You are a strategic consultant. Create a competitive analysis report with:
-1. Executive Summary (3 sentences)
-2. Competitive Landscape Table (company, strength, weakness, price)
-3. Market Gaps & Opportunities (3 bullet points)
-4. Strategic Recommendations for {company} (5 action items)
-5. Threat Assessment (High/Medium/Low for each competitor)""".replace("{company}", state["company"])),
-        HumanMessage(content=f"Company: {state['company']}\nIndustry: {state['industry']}\n\nCompetitor analyses:\n{analyses_text}"),
+        SystemMessage(content="""你是一个战略顾问。请创建一个竞争对手分析报告，包含以下内容：
+1. 执行摘要（3个句子）
+2. 竞争 landscape 表格（公司、优势、劣势、价格）
+3. 市场差距和机会（3个要点）
+4. {company} 的战略建议（5个操作项）
+5. 每个竞争对手的风险评估（High/Medium/Low）""".replace("{company}", state["company"])),
+        HumanMessage(content=f"公司: {state['company']}\n行业: {state['industry']}\n\n竞争对手分析结果:\n{analyses_text}"),
     ])
 
     return {"final_report": response.content, "messages": [response]}
@@ -90,12 +108,12 @@ def build_graph():
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Competitive Analysis Agent")
-    parser.add_argument("--company", default="Notion", help="Company to analyze")
-    parser.add_argument("--industry", default="productivity and collaboration software", help="Industry")
+    parser = argparse.ArgumentParser(description="竞争对手分析智能体")
+    parser.add_argument("--company", default="Notion", help="公司名称")
+    parser.add_argument("--industry", default="生产效率和协作软件", help="行业")
     args = parser.parse_args()
 
-    print(f"\n🔍 Analyzing competitive landscape for {args.company}...\n")
+    print(f"\n🔍 分析公司 {args.company} 的 {args.industry} 市场分析...\n")
 
     agent = build_graph()
     result = agent.invoke({
@@ -107,9 +125,9 @@ def main():
         "final_report": "",
     })
 
-    print(f"🏢 Competitors identified: {', '.join(result['competitors'])}\n")
+    print(f"🏢 确定的竞争对手: {', '.join(result['competitors'])}\n")
     print("=" * 60)
-    print("📊 COMPETITIVE ANALYSIS REPORT")
+    print("📊 竞争分析分析报告")
     print("=" * 60)
     print(result["final_report"])
 
