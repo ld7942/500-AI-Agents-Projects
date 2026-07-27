@@ -1,11 +1,11 @@
 title: recipe-recommendation-agent
-description: Suggests recipes from available ingredients with instructions and nutrition info
+description: 根据可用食材推荐食谱，包含烹饪步骤和营养信息
 author: ashishpatel26
 language: python
 framework: langchain
 tags: [recipes, food, nutrition, recommendation]
 industry: food
 difficulty: beginner
-llm: gpt-4o-mini
+llm: gemma4:e4b (Ollama)
 entrypoint: agent.py
 requirements: requirements.txt
