@@ -1,0 +1,4 @@
+python-dotenv==1.2.2
+requests==2.34.2
+presidio_analyzer==2.2.364
+presidio_anonymizer==2.2.364
