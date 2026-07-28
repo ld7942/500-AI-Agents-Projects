@@ -62,13 +62,42 @@ class MCPClient:
             "method": "initialize",
             "params": {
                 "protocolVersion": self.PROTOCOL_VERSION,
-                "capabilities": {}
+                "capabilities": {
+                    "tools": {},
+                    "resources": {},
+                    "prompts": {}
+                },
+                "clientInfo": {
+                    "name": "crewai-mcp-client",
+                    "version": "1.0.0"
+                }
             }
         }
         
         response = await client.post(self.server_url, json=payload, headers=headers)
         response.raise_for_status()
-        result = response.json()
+        
+        # 调试：查看响应内容
+        text_content = response.text
+        print(f"📥 初始化响应状态码: {response.status_code}")
+        print(f"📥 初始化响应内容: {text_content[:500]}")
+        
+        # 处理响应
+        if not text_content.strip():
+            raise Exception("服务器返回空响应")
+        
+        # 处理 SSE 格式响应
+        content_type = response.headers.get("content-type", "")
+        if "text/event-stream" in content_type:
+            lines = text_content.split("\n")
+            for line in lines:
+                if line.startswith("data: "):
+                    result = json.loads(line[6:])
+                    break
+            else:
+                raise Exception("无法解析 SSE 响应")
+        else:
+            result = response.json()
         
         if "error" in result:
             raise Exception(f"MCP 初始化失败: {result['error'].get('message', '未知错误')}")
@@ -95,8 +124,8 @@ class MCPClient:
         }
         
         response = await client.post(self.server_url, json=payload, headers=headers)
-        response.raise_for_status()
-        print(f"✅ MCP initialized 通知发送成功")
+        # 通知响应可能是 202 Accepted 且没有响应体，不需要解析 JSON
+        print(f"✅ MCP initialized 通知发送成功，状态码: {response.status_code}")
     
     async def _call_mcp(self, tool_name: str, arguments: dict = None) -> Any:
         """调用 MCP 服务器上的工具"""
@@ -128,7 +157,31 @@ class MCPClient:
                 
                 response = await client.post(self.server_url, json=payload, headers=headers)
                 response.raise_for_status()
-                result = response.json()
+                
+                # 调试：查看响应内容
+                content_type = response.headers.get("content-type", "")
+                text_content = response.text
+                print(f"📤 请求工具: {tool_name}")
+                print(f"📥 响应状态码: {response.status_code}")
+                print(f"📥 Content-Type: {content_type}")
+                print(f"📥 响应内容: {text_content[:500]}")
+                
+                # 尝试解析响应
+                if not text_content.strip():
+                    raise Exception("服务器返回空响应")
+                
+                # 处理 SSE 格式响应
+                if "text/event-stream" in content_type:
+                    # SSE 格式：event: message\ndata: {...}\n\n
+                    lines = text_content.split("\n")
+                    for line in lines:
+                        if line.startswith("data: "):
+                            result = json.loads(line[6:])
+                            break
+                    else:
+                        raise Exception("无法解析 SSE 响应")
+                else:
+                    result = response.json()
                 
                 if "error" in result:
                     raise Exception(f"MCP 工具调用失败: {result['error'].get('message', '未知错误')}")
