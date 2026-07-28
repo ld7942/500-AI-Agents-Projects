@@ -36,34 +36,97 @@ load_dotenv()
 llm = "ollama/gemma4:e4b"
 
 # MCP 服务器配置
-MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8000")
+MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8000/mcp")
 
 
 class MCPClient:
     """MCP 客户端，用于调用 MCP 服务器上的工具"""
     
+    PROTOCOL_VERSION = "2025-06-18"
+    
     def __init__(self, server_url: str = MCP_SERVER_URL):
         self.server_url = server_url
         self._available_tools: Optional[list] = None
+        self._session_id: Optional[str] = None
+    
+    async def _initialize(self, client: httpx.AsyncClient):
+        """初始化 MCP 会话"""
+        headers = {
+            "Accept": "application/json, text/event-stream",
+            "Content-Type": "application/json",
+        }
+        
+        payload = {
+            "jsonrpc": "2.0",
+            "id": 1,
+            "method": "initialize",
+            "params": {
+                "protocolVersion": self.PROTOCOL_VERSION,
+                "capabilities": {}
+            }
+        }
+        
+        response = await client.post(self.server_url, json=payload, headers=headers)
+        response.raise_for_status()
+        result = response.json()
+        
+        if "error" in result:
+            raise Exception(f"MCP 初始化失败: {result['error'].get('message', '未知错误')}")
+        
+        # 获取会话ID
+        self._session_id = response.headers.get("Mcp-Session-Id")
+        print(f"✅ MCP 会话初始化成功，Session ID: {self._session_id}")
+        
+        # 发送 initialized 通知
+        await self._send_initialized_notification(client)
+    
+    async def _send_initialized_notification(self, client: httpx.AsyncClient):
+        """发送 initialized 通知"""
+        headers = {
+            "Accept": "application/json, text/event-stream",
+            "Content-Type": "application/json",
+            "Mcp-Session-Id": self._session_id,
+            "MCP-Protocol-Version": self.PROTOCOL_VERSION,
+        }
+        
+        payload = {
+            "jsonrpc": "2.0",
+            "method": "notifications/initialized"
+        }
+        
+        response = await client.post(self.server_url, json=payload, headers=headers)
+        response.raise_for_status()
+        print(f"✅ MCP initialized 通知发送成功")
     
     async def _call_mcp(self, tool_name: str, arguments: dict = None) -> Any:
         """调用 MCP 服务器上的工具"""
         if not HAS_HTTPX:
             raise ImportError("httpx 未安装，请运行: pip install httpx")
         
-        payload = {
-            "jsonrpc": "2.0",
-            "id": 1,
-            "method": "tools/call",
-            "params": {
-                "name": tool_name,
-                "arguments": arguments or {}
-            }
-        }
-        
         try:
             async with httpx.AsyncClient(timeout=5.0) as client:
-                response = await client.post(self.server_url, json=payload)
+                # 如果没有会话ID，先初始化
+                if not self._session_id:
+                    await self._initialize(client)
+                
+                headers = {
+                    "Accept": "application/json, text/event-stream",
+                    "Content-Type": "application/json",
+                    "Mcp-Session-Id": self._session_id,
+                    "MCP-Protocol-Version": self.PROTOCOL_VERSION,
+                }
+                
+                payload = {
+                    "jsonrpc": "2.0",
+                    "id": 1,
+                    "method": "tools/call",
+                    "params": {
+                        "name": tool_name,
+                        "arguments": arguments or {}
+                    }
+                }
+                
+                response = await client.post(self.server_url, json=payload, headers=headers)
                 response.raise_for_status()
                 result = response.json()
                 

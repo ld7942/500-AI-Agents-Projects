@@ -92,6 +92,6 @@ if __name__ == "__main__":
         # 启动MCP服务器，监听localhost:8000
         print("🚀 CrewAI 课程工具服务器启动在 localhost:8000")
         print("工具可用: get_datetime, prioritize_tasks, format_as_json, calculate_project_metrics")
-        mcp.run(transport="streamable-http", host="localhost", port=8000)
+        mcp.run(transport="http", host="localhost", port=8000)
     else:
         print("请安装FastMCP库以运行服务器: pip install fastmcp")
