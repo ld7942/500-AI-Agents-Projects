@@ -96,11 +96,11 @@ python agent.py
 
 | 用例 | 行业 | 描述 | 代码 |
 |---|---|---|---|
-| **HIA（健康洞察 Agent）** | 医疗保健 | 分析医疗报告并提供健康洞察 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/harshhh28/hia.git) |
-| **AI 健康助手** | 医疗保健 | 使用患者数据进行疾病诊断和监测 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/ahmadvh/AI-Agents-for-Medical-Diagnostics.git) |
-| **自动化交易机器人** | 金融 | 通过实时市场分析实现股票交易自动化 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/MingyuJ666/Stockagent.git) |
+| **HIA（健康洞察 Agent）** | 医疗保健 | 分析医疗报告并提供健康洞察 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/harshhh28/hia) |
+| **AI 健康助手** | 医疗保健 | 使用患者数据进行疾病诊断和监测 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/ahmadvh/AI-Agents-for-Medical-Diagnostics) |
+| **自动化交易机器人** | 金融 | 通过实时市场分析实现股票交易自动化 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/MingyuJ666/Stockagent) |
 | **Agent Wallet SDK** | 金融 | 面向 AI Agent 的非托管智能合约钱包 SDK，支持强制消费限额 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/up2itnow0822/agent-wallet-sdk) |
-| **虚拟 AI 导师** | 教育 | 提供个性化教育服务 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/hqanhh/EduGPT.git) |
+| **虚拟 AI 导师** | 教育 | 提供个性化教育服务 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/hqanhh/EduGPT) |
 | **24/7 AI 聊天机器人** | 客户服务 | 全天候处理客户咨询 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/NirDiamant/GenAI_Agents/blob/main/all_agents_tutorials/customer_support_agent_langgraph.ipynb) |
 | **产品推荐 Agent** | 零售 | 根据用户偏好和历史记录推荐产品 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/microsoft/RecAI) |
 | **自动驾驶配送 Agent** | 交通 | 优化路线并自主配送包裹 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/sled-group/driVLMe) |
@@ -117,9 +117,12 @@ python agent.py
 | **电商个人购物 Agent** | 电商 | 帮助客户找到心仪的产品 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/Hoanganhvu123/ShoppingGPT) |
 | **物流优化 Agent** | 供应链 | 规划高效配送路线并管理库存 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/microsoft/OptiGuide) |
 | **Vibe Hacking Agent** | 网络安全 | 基于自主多 Agent 的红队测试服务 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/PurpleAILAB/Decepticon) |
+| **Agent Memory Guard** | Cybersecurity | Detects and blocks memory poisoning attacks (OWASP ASI06) in AI agent memory stores | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/OWASP/www-project-agent-memory-guard) |
 | **Citadel** | 软件开发 | 编排 Claude Code Agent 集群，支持生命周期钩子、技能、活动管理和事后分析驱动架构 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/SethGammon/Citadel) |
 | **MediSuite-AI-Agent** | 健康保险 | 自动化医院/保险理赔工作流 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/ahmedmansour5/MediSuite-Ai-Agent) |
 | **Lina 埃及医疗聊天机器人** | 医疗保健 | 埃及医疗辅助聊天机器人 | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/dina-khalid/Lina-Egyptian-Medical-Chatbot) |
+| **NextRole (AI Career Assistant)** | Human Resources | Tailors a resume to a job description and generates interview prep plus a day-of battlecard via a multi-agent system | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/tam159/next-role) |
+| **PII Sanitization Agent** | Privacy/Compliance | Redacts PII (emails, phones, national IDs, bank accounts, API keys) from text before it reaches an LLM; fail-closed, multilingual, on-chain proof via TrustBoost | [![GitHub](https://img.shields.io/badge/Code-GitHub-black?logo=github)](https://github.com/teodorofodocrispin-cmyk/TrustBoost-PII-Sanitizer) |
 
 ---
 
